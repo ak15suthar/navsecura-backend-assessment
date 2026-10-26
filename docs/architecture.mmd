@@ -1,0 +1,11 @@
+flowchart LR
+  S[Camera / sensor sources] -->|POST /v1/events| API[Node.js + Express API]
+  OP[Operator application] -->|Read cases / metrics| API
+  API -->|Transaction: insert once + record delivery attempt| DB[(PostgreSQL)]
+  DB --> EV[(security_events: source of truth + durable work queue)]
+  DB --> CASE[(operational_cases + case_events)]
+  DB --> MET[(ingestion_attempts + processing_failures)]
+  W1[Worker slot 1] -->|SKIP LOCKED claim| DB
+  W2[Worker slot 2..N] -->|SKIP LOCKED claim| DB
+  W1 -->|Atomic correlation + event completion transaction| DB
+  W2 -->|Atomic correlation + event completion transaction| DB

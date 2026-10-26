@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: navsecura
+      POSTGRES_PASSWORD: navsecura
+      POSTGRES_DB: navsecura
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U navsecura -d navsecura"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - navsecura_pgdata:/var/lib/postgresql/data
+volumes:
+  navsecura_pgdata:

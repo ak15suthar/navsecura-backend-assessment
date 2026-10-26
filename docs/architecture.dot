@@ -1,0 +1,18 @@
+digraph NavSecura {
+  rankdir=LR; graph [bgcolor="white", pad="0.25", nodesep="0.55", ranksep="0.7", fontname="Arial", label="NavSecura — reliable event processing", labelloc=t, fontsize=20];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4ff", color="#5576a8", fontname="Arial", fontsize=10, margin="0.18,0.12"];
+  edge [color="#52657a", fontname="Arial", fontsize=9, arrowsize=0.75];
+  sources [label="Cameras / sensors\nEvent producers", fillcolor="#f4f4f5", color="#737373"];
+  api [label="Node.js + TypeScript\nExpress ingestion API"];
+  pg [shape=cylinder, label="PostgreSQL\nDurable source of truth", fillcolor="#e7f7ed", color="#39845b"];
+  events [label="security_events\nUnique event key + work status", fillcolor="#e7f7ed", color="#39845b"];
+  cases [label="operational_cases\ncase_events", fillcolor="#e7f7ed", color="#39845b"];
+  metrics [label="ingestion_attempts\nprocessing_failures", fillcolor="#e7f7ed", color="#39845b"];
+  workers [label="Worker pool\nSKIP LOCKED + lease", fillcolor="#fff4df", color="#a87922"];
+  operator [label="Operator application\nCases + processing stats", fillcolor="#f4f4f5", color="#737373"];
+  sources -> api [label="POST event"];
+  api -> pg [label="transactional insert\n+ duplicate accounting"];
+  pg -> events [arrowhead=none]; pg -> cases [arrowhead=none]; pg -> metrics [arrowhead=none];
+  workers -> pg [label="claim + atomic\ncase processing"];
+  api -> operator [dir=both, label="REST reads"];
+}
